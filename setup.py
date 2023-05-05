@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
 setup(
-    name="mpy",
+    name="qshpost",
     version=__version__,
     description="QSH data processing tools",
     long_description=long_description,
