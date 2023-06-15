@@ -5,7 +5,108 @@ from mpy.specMagneticField import FieldLine
 from typing import Tuple
 
 
-class CrossSurface:
+class FirstCrossSurface:
+    
+    def __init__(self, xm: np.ndarray, sSin: np.ndarray, sCos: np.ndarray) -> None:
+        self.xm = xm
+        self.sSin = sSin
+        self.sCos = sCos
+
+    @classmethod
+    def fitFirstCross(cls, line: FieldLine, mpol: int=12, **kwargs):
+        sArr, thetaArr = list(), list()
+        for i in range(len(line.sArr)):
+            if i % line.nZeta == 0:
+                sArr.append(line.sArr[i])
+                thetaArr.append(line.thetaArr[i])
+        xm, coeffSin, coeffCos = fitting.fitPeriodicCurve(np.array(thetaArr), np.array(sArr), mpol)
+        return cls(xm=xm, sSin=coeffSin, sCos=coeffCos)
+
+    def getS(self, thetaArr):
+        angleMat = np.dot(self.xm.reshape(-1,1), thetaArr.reshape(1,-1))
+        return (
+            np.dot(self.sSin.reshape(1,-1), np.sin(angleMat)) + 
+            np.dot(self.sCos.reshape(1,-1), np.cos(angleMat))
+        ).flatten()
+
+
+class SecondCrossSurface:
+    
+    def __init__(self, xm: np.ndarray, sSin: np.ndarray, sCos: np.ndarray, thetaSin: np.ndarray, thetaCos: np.ndarray) -> None:
+        self.xm = xm
+        self.sSin = sSin
+        self.sCos = sCos
+        self.thetaSin = thetaSin
+        self.thetaCos = thetaCos
+
+    @classmethod
+    def fitSecondCross(cls, line: FieldLine, mpol: int=12, **kwargs):
+        rArr, zArr, sArr, thetaArr = list(), list(), list(), list()
+        for i in range(len(line.rArr)):
+            if i % line.nZeta == 0 and line.zArr[i] >= 0:
+                rArr.append(line.rArr[i])
+                zArr.append(line.zArr[i])
+                sArr.append(line.sArr[i])
+                thetaArr.append(line.thetaArr[i])
+        rArr = np.array(rArr)
+        zArr = np.array(zArr)
+        sArr = np.array(sArr)
+        thetaArr = np.array(thetaArr)
+        nums = rArr.size
+        pointState = [False for _i in range(nums)]
+        pointIndex = 0
+        pointState[pointIndex]= True
+        _rArr, _zArr, _sArr, _thetaArr = [rArr[pointIndex]], [zArr[pointIndex]], [sArr[pointIndex]], [thetaArr[pointIndex]]
+        for i in range(nums):
+            minDistance = 1e10
+            _index = pointIndex
+            for j in range(nums):
+                if pointState[j] == False:
+                    distance = np.power(rArr[pointIndex]-rArr[j],2) +  np.power(zArr[pointIndex]-zArr[j],2)
+                    if distance < minDistance:
+                        minDistance = distance
+                        _index = j
+            pointIndex = _index
+            pointState[pointIndex]= True
+            _rArr.append(rArr[pointIndex])
+            _zArr.append(zArr[pointIndex])
+            _sArr.append(sArr[pointIndex])
+            _thetaArr.append(thetaArr[pointIndex])
+        for i in range(nums):
+            _rArr.append(_rArr[nums-1-i])
+            _zArr.append(-_zArr[nums-1-i])
+            _sArr.append(_sArr[nums-1-i])
+            _thetaArr.append(-_thetaArr[nums-1-i])
+        sArr = np.array(_sArr)
+        _thetaArr = np.array(_thetaArr) % (2*np.pi)
+        thetaArr = np.where(_thetaArr<np.pi, _thetaArr, _thetaArr-(2*np.pi))
+        disArr = np.zeros(len(_rArr))
+        for i in range(len(_rArr)-1):
+            disArr[i+1] = np.power(np.power(_rArr[i+1]-_rArr[i],2)+np.power(_zArr[i+1]-_zArr[i],2), 0.5)
+        sumDis = np.cumsum(disArr)
+        labelArr = 2*np.pi*sumDis/sumDis[-1]
+        xm, thetaSin, thetaCos = fitting.fitPeriodicCurve(np.array(labelArr), np.array(thetaArr), mpol)
+        xm, sSin, sCos = fitting.fitPeriodicCurve(np.array(labelArr), np.array(sArr), mpol)
+        return cls(xm=xm, sSin=sSin, sCos=sCos, thetaSin=thetaSin, thetaCos=thetaCos)
+
+    def getS(self, labelArr):
+        angleMat = np.dot(self.xm.reshape(-1,1), labelArr.reshape(1,-1))
+        return (
+            np.dot(self.sSin.reshape(1,-1), np.sin(angleMat)) + 
+            np.dot(self.sCos.reshape(1,-1), np.cos(angleMat))
+        ).flatten()
+
+    def getTheta(self, labelArr):
+        angleMat = np.dot(self.xm.reshape(-1,1), labelArr.reshape(1,-1))
+        return (
+            np.dot(self.thetaSin.reshape(1,-1), np.sin(angleMat)) + 
+            np.dot(self.thetaCos.reshape(1,-1), np.cos(angleMat))
+        ).flatten()
+
+
+
+# Old Codes #########################################################################################################################################
+class OldCrossSurface:
 
     def __init__(self, xm: np.ndarray, rc: np.ndarray, rs: np.ndarray, zc: np.ndarray, zs: np.ndarray) -> None: 
         self.xm = xm
