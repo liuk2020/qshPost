@@ -5,3 +5,4 @@ from .successCase import SuccessCase
 from .axis import Axis
 from .crossSurface import OldCrossSurface, FirstCrossSurface, SecondCrossSurface
 from .flux import getFirstFlux, getSecondFlux
+from .iota import getFirstIota, getSecondIota
