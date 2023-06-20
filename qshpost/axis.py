@@ -2,6 +2,7 @@ import h5py
 import mpy
 import mpy.specMagneticField as specMagneticField
 import numpy as np
+from scipy.integrate import dblquad
 from scipy.optimize import least_squares
 from typing import Tuple
 
@@ -69,6 +70,44 @@ class Axis:
             np.dot(self.zas.reshape(1,-1), np.sin(angleMat))
         ).flatten()
         return rArr, zArr
+
+    def getXYZ(self, zetaArr: np.ndarray) -> Tuple[np.ndarray]:
+        rArr, zArr = self.getRZ(zetaArr)
+        xArr = np.cos(zetaArr) * rArr
+        yArr = np.sin(zetaArr) * rArr
+        return xArr, yArr, zArr
+
+    def getWrithe(self) -> float:
+        def getRZ(zeta: float) -> Tuple[np.float64]:
+            angle = zeta * self.xn.flatten()
+            r, z = np.dot(self.rac.flatten(), np.cos(angle)), np.dot(self.zas.flatten(), np.sin(angle))
+            return r, z
+        def getdRZ(zeta: float) -> Tuple[np.float64]:
+            angle = zeta * self.xn.flatten()
+            dR = np.dot(self.xn*self.rac.flatten(), np.sin(-angle))
+            dZ = np.dot(self.xn*self.zas.flatten(), np.cos(angle))
+            return dR, dZ
+        def getValue(zeta2, zeta1):
+            if zeta1 == zeta2:
+                return 0
+            r1, z1 = getRZ(zeta1)
+            x1, y1 = r1*np.cos(zeta1), r1*np.sin(zeta1)
+            r2, z2 = getRZ(zeta2)
+            x2, y2 = r2*np.cos(zeta2), r2*np.sin(zeta2)
+            dR1, dZ1 = getdRZ(zeta1)
+            dX1, dY1 = dR1*np.cos(zeta1)-r1*np.sin(zeta1), dR1*np.sin(zeta1)+r1*np.cos(zeta1)
+            dR2, dZ2 = getdRZ(zeta2)
+            dX2, dY2 = dR2*np.cos(zeta2)-r2*np.sin(zeta2), dR2*np.sin(zeta2)+r2*np.cos(zeta2)
+            dXYZ1 = np.array([dX1, dY1, dZ1])
+            dXYZ2 = np.array([dX2, dY2, dZ2])
+            deltaXYZ = np.array([x2-x1, y2-y1, z2-z1])
+            norm = np.linalg.norm(deltaXYZ)
+            return np.linalg.det(np.array([[dX1, dY1, dZ1], [dX2, dY2, dZ2], [x2-x1, y2-y1, z2-z1]])) / np.power(norm,3)        
+        value, err = dblquad(getValue,0,2*np.pi,0,2*np.pi)
+        print("An estimate of the error is " + str(err) + " ...")
+        ans = value/np.pi/4
+        print("The writhe of the axis curve is " + str(ans) + " ...")
+        return ans
 
     @classmethod
     def readH5(cls, fileName: str):
