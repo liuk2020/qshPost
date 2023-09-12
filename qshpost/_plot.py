@@ -23,5 +23,22 @@ def plotCase(case: SPECOut, ax=None, **kwargs):
     plt.axis("equal")
 
 
+def plotQ(case: SPECOut, ax=None, **kwargs):
+    if ax is None:
+        fig, ax = plt.subplots()
+    plt.sca(ax)
+    if kwargs.get("marker") == None:
+        kwargs.update({"marker": "."})
+    xdata = case.poincare.R[:, 0, 0]
+    ydata = case.transform.fiota[1, case.poincare.success==1]
+    xlabel = r"R"
+    ylabel = r"$\iota$"
+    dots = ax.scatter(xdata[1:-1], 1/ydata[1:-1], **kwargs)
+    plt.xlabel(xlabel, fontsize=20)
+    plt.ylabel(ylabel, fontsize=20)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+
+
 if __name__ == "__main__":
     pass

@@ -1,7 +1,7 @@
 import mpy
 import numpy as np
 import matplotlib.pyplot as plt
-from ._plotPoincare import plotCase
+from ._plot import plotCase
 from mpy.vmec2spec.misc import mu0
 from mpy.misc.print import print_progress
 from typing import List
