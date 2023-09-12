@@ -7,3 +7,4 @@ from .crossSurface import OldCrossSurface, FirstCrossSurface, SecondCrossSurface
 from .flux import getFirstFlux, getSecondFlux
 from .iota import getFirstIota, getSecondIota
 from .tracing import traceLine
+from .pinch_reversal import getPinchReversalPara
