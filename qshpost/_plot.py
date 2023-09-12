@@ -32,7 +32,7 @@ def plotQ(case: SPECOut, ax=None, **kwargs):
     xdata = case.poincare.R[:, 0, 0]
     ydata = case.transform.fiota[1, case.poincare.success==1]
     xlabel = r"R"
-    ylabel = r"$\iota$"
+    ylabel = r"$q$"
     dots = ax.scatter(xdata[1:-1], 1/ydata[1:-1], **kwargs)
     plt.xlabel(xlabel, fontsize=20)
     plt.ylabel(ylabel, fontsize=20)
