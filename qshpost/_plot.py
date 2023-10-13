@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 from mpy import SPECOut
 
 
-def plotCase(case: SPECOut, ax=None, **kwargs):
-    toroidalIdx = 0
+def plotCase(case: SPECOut, ax=None, toroidalIdx: int=0, **kwargs):
     if ax is None:
         fig, ax = plt.subplots()
     plt.sca(ax)
@@ -18,8 +17,8 @@ def plotCase(case: SPECOut, ax=None, **kwargs):
     nptrj = rr.shape[0]
     for ii in range(nptrj-1):
         dots = ax.scatter(rr[ii, :], zz[ii, :], **kwargs)
-    plt.xlabel("R [m]", fontsize=14)
-    plt.ylabel("Z [m]", fontsize=14)
+    plt.xlabel(r"$R(\mathrm{m})$", fontsize=15)
+    plt.ylabel(r"$Z(\mathrm{m})$", fontsize=15)
     plt.axis("equal")
 
 
