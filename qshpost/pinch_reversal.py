@@ -26,11 +26,11 @@ def getPinchReversalPara(spec_file: str, majorRadius: float, minorRadius: float,
         bSupS, bSupTheta, bSupZeta = getBoundaryB(0, zeta)
         return bSupZeta
     pinchParameter = (
-        (quad(getB_theta, 0, 2*np.pi)[0] / (2*np.pi*minorRadius))
+        (quad(getB_theta, 0, 2*np.pi)[0] / (2*np.pi))
         / (phiEdge / (np.pi*minorRadius*minorRadius))
     )
     reversalParameter = (
-        (quad(getB_zeta, 0, 2*np.pi)[0] / (2*np.pi*(majorRadius+minorRadius)))
+        (quad(getB_zeta, 0, 2*np.pi)[0] / (2*np.pi))
         / (phiEdge / (np.pi*minorRadius*minorRadius))
     )
     return pinchParameter, reversalParameter
