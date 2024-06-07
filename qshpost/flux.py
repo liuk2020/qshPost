@@ -11,7 +11,7 @@ def getFirstFlux(bField: specMagneticField.SPECField, crossSurf: FirstCrossSurfa
     
     pyoculusField = SPECBfield(bField.specData, bField.lvol+1)
     def getPotential(theta):
-        return pyoculusField.vectorPotential([crossSurf.getS(np.array([theta])),theta,0])[0]
+        return pyoculusField.vectorPotential([crossSurf.getS(np.array([theta])),np.array([theta]),np.zeros(1)])[0]
     
     res = quad(getPotential, 0, 2*np.pi)
     return res[0]
@@ -21,7 +21,7 @@ def getSecondFlux(bField: specMagneticField.SPECField, crossSurf: SecondCrossSur
 
     pyoculusField = SPECBfield(bField.specData, bField.lvol+1)
     def getPotential(label):
-        return pyoculusField.vectorPotential([crossSurf.getS(np.array([label])),crossSurf.getTheta(np.array([label])),0])[0]
+        return pyoculusField.vectorPotential([crossSurf.getS(np.array([label])),crossSurf.getTheta(np.array([label])),np.zeros(1)])[0]
     
     def dTheta(label):
         deltaLabel = 1e-8

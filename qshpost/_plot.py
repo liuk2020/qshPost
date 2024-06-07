@@ -17,8 +17,10 @@ def plotCase(case: SPECOut, ax=None, toroidalIdx: int=0, **kwargs):
     nptrj = rr.shape[0]
     for ii in range(nptrj-1):
         dots = ax.scatter(rr[ii, :], zz[ii, :], **kwargs)
-    plt.xlabel(r"$R(\mathrm{m})$", fontsize=15)
-    plt.ylabel(r"$Z(\mathrm{m})$", fontsize=15)
+    plt.xlabel(r"$R(\mathrm{m})$", fontsize=20)
+    plt.ylabel(r"$Z(\mathrm{m})$", fontsize=20)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
     plt.axis("equal")
 
 

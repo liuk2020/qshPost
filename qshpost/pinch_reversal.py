@@ -5,11 +5,12 @@ from scipy.integrate import quad
 from typing import Tuple
 
 
-def getPinchReversalPara(speclib: SPECOut, majorRadius: float, minorRadius: float, phiEdge: float) -> Tuple:
+def getPinchReversalPara(spec_file: str, majorRadius: float, minorRadius: float, phiEdge: float) -> Tuple:
     """
     returns:
         pinch parameter, reversal parameter
     """
+    speclib = SPECOut(spec_file)
     outerField = SPECField(specData=speclib, lvol=1, sResolution=128, thetaResolution=128, zetaResolution=128)     
     baseJacobian = outerField.getJacobian()
     deltaS = 1e-8
